@@ -1,0 +1,275 @@
+{
+  "info": {
+    "name": "FADESP - Pagamentos API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "fadesp-pagamentos-1762536945"
+  },
+  "item": [
+    {
+      "name": "1) Criar pagamento",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/pagamentos",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "pagamentos"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigoDebito\": 123456,\n  \"cpfCnpj\": \"12345678901\",\n  \"metodoPagamento\": \"PIX\",\n  \"numeroCartao\": null,\n  \"valor\": 250.0\n}"
+        },
+        "description": "Cria um novo pagamento (status inicial: PENDENTE)."
+      },
+      "response": []
+    },
+    {
+      "name": "2) Buscar por ID",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/pagamentos/{{pagamentoId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "pagamentos",
+            "{{pagamentoId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3) Listar todos (paginado)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/pagamentos?page={{page}}&size={{size}}&sort=id,desc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "pagamentos"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "{{page}}"
+            },
+            {
+              "key": "size",
+              "value": "{{size}}"
+            },
+            {
+              "key": "sort",
+              "value": "id,desc"
+            }
+          ]
+        },
+        "description": "Lista todos os pagamentos com paginação."
+      },
+      "response": []
+    },
+    {
+      "name": "4) Listar por CPF/CNPJ",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/pagamentos/cpf-cnpj/{{cpfCnpj}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "pagamentos",
+            "cpf-cnpj",
+            "{{cpfCnpj}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5) Listar por código de débito",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/pagamentos/codigo/{{codigoDebito}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "pagamentos",
+            "codigo",
+            "{{codigoDebito}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6) Listar por status",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/pagamentos/status/{{status}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "pagamentos",
+            "status",
+            "{{status}}"
+          ]
+        },
+        "description": "Valores aceitos: PENDENTE, PROCESSADO_COM_SUCESSO, PROCESSADO_COM_FALHA."
+      },
+      "response": []
+    },
+    {
+      "name": "7) Buscar por código + CPF/CNPJ",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/pagamentos/codigo/{{codigoDebito}}/cpf-cnpj/{{cpfCnpj}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "pagamentos",
+            "codigo",
+            "{{codigoDebito}}",
+            "cpf-cnpj",
+            "{{cpfCnpj}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8) Listar por CPF/CNPJ + status",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/pagamentos/cpf-cnpj/{{cpfCnpj}}/status/{{status}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "pagamentos",
+            "cpf-cnpj",
+            "{{cpfCnpj}}",
+            "status",
+            "{{status}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "9) Atualizar status (PATCH)",
+      "request": {
+        "method": "PATCH",
+        "url": {
+          "raw": "{{baseUrl}}/api/pagamentos/{{pagamentoId}}/status?novoStatus={{novoStatus}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "pagamentos",
+            "{{pagamentoId}}",
+            "status"
+          ],
+          "query": [
+            {
+              "key": "novoStatus",
+              "value": "{{novoStatus}}"
+            }
+          ]
+        },
+        "description": "Transições válidas: PENDENTE → {PENDENTE, PROCESSADO_COM_SUCESSO, PROCESSADO_COM_FALHA}; PROCESSADO_COM_FALHA → PENDENTE; PROCESSADO_COM_SUCESSO → não altera."
+      },
+      "response": []
+    },
+    {
+      "name": "10) Excluir logicamente (DELETE)",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/api/pagamentos/{{pagamentoId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "pagamentos",
+            "{{pagamentoId}}"
+          ]
+        },
+        "description": "Só permite quando status = PENDENTE. Marca ativo=false."
+      },
+      "response": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "pagamentoId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "cpfCnpj",
+      "value": "12345678901",
+      "type": "string"
+    },
+    {
+      "key": "codigoDebito",
+      "value": "123456",
+      "type": "string"
+    },
+    {
+      "key": "status",
+      "value": "PENDENTE",
+      "type": "string"
+    },
+    {
+      "key": "novoStatus",
+      "value": "PROCESSADO_COM_SUCESSO",
+      "type": "string"
+    },
+    {
+      "key": "page",
+      "value": "0",
+      "type": "string"
+    },
+    {
+      "key": "size",
+      "value": "10",
+      "type": "string"
+    }
+  ]
+}
