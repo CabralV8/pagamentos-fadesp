@@ -49,7 +49,7 @@ Acesse:
 
 No console H2 use:
 
-- JDBC URL: jdbc:h2:mem:testdb
+- JDBC URL: jdbc:h2:mem:db_pagamentos
 
 - User: sa
 
