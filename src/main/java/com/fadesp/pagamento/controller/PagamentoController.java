@@ -7,6 +7,7 @@ import com.fadesp.pagamento.infrastructure.enums.StatusPagamentoEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -45,50 +46,19 @@ public class PagamentoController {
     }
 
 
+
     @GetMapping
-    @Operation(summary = "Listar todos os pagamentos com paginação")
-    public ResponseEntity<Page<PagamentoResponseDTO>> listarTodosPagamentos(Pageable pageable) {
-        return ResponseEntity.ok(pagamentoService.listarTodos(pageable));
+    @Operation(summary = "Listar pagamentos (com filtros opcionais e paginação)")
+    public ResponseEntity<Page<PagamentoResponseDTO>> listarPagamentos(
+            @RequestParam(required = false) Integer codigoDebito,
+            @RequestParam(required = false) String cpfCnpjPagador,
+            @RequestParam(required = false) StatusPagamentoEnum status,
+            @ParameterObject Pageable pageable
+    ) {
+        Page<PagamentoResponseDTO> page = pagamentoService.listarComFiltros(codigoDebito, cpfCnpjPagador, status, pageable);
+        return ResponseEntity.ok(page);
     }
 
-
-    @GetMapping("/cpf-cnpj/{cpfCnpj}")
-    @Operation(summary = "Listar pagamentos por CPF/CNPJ")
-    public ResponseEntity<List<PagamentoResponseDTO>> buscarPagamentosPorCpfCnpj(@PathVariable String cpfCnpj) {
-        return ResponseEntity.ok(pagamentoService.buscarPorCpfCnpj(cpfCnpj));
-    }
-
-
-    @GetMapping("/codigo/{codigoDebito}")
-    @Operation(summary = "Listar pagamentos por código de débito")
-    public ResponseEntity<List<PagamentoResponseDTO>> buscarPagamentosPorCodigoDebito(@PathVariable Integer codigoDebito) {
-        return ResponseEntity.ok(pagamentoService.buscarPorCodigoDebito(codigoDebito));
-    }
-
-
-    @GetMapping("/status/{status}")
-    @Operation(summary = "Listar pagamentos por status")
-    public ResponseEntity<List<PagamentoResponseDTO>> buscarPagamentosPorStatus(@PathVariable StatusPagamentoEnum status) {
-        return ResponseEntity.ok(pagamentoService.buscarPorStatus(status));
-    }
-
-
-    @GetMapping("/codigo/{codigoDebito}/cpf-cnpj/{cpfCnpj}")
-    @Operation(summary = "Buscar pagamento por código do débito e CPF/CNPJ")
-    public ResponseEntity<PagamentoResponseDTO> buscarPorCodigoEDocumento(
-            @PathVariable Integer codigoDebito,
-            @PathVariable String cpfCnpj) {
-        return ResponseEntity.ok(pagamentoService.buscarPorCodigoEDocumento(codigoDebito, cpfCnpj));
-    }
-
-
-    @GetMapping("/cpf-cnpj/{cpfCnpj}/status/{status}")
-    @Operation(summary = "Listar pagamentos por CPF/CNPJ e status")
-    public ResponseEntity<List<PagamentoResponseDTO>> buscarPorDocumentoEStatus(
-            @PathVariable String cpfCnpj,
-            @PathVariable StatusPagamentoEnum status) {
-        return ResponseEntity.ok(pagamentoService.buscarPorDocumentoEStatus(cpfCnpj, status));
-    }
 
 
     @PatchMapping("/{id}/status")

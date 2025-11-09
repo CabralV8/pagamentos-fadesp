@@ -1,9 +1,0 @@
-.git
-.gitignore
-target
-build
-.gradle
-.idea
-*.iml
-*.log
-node_modules

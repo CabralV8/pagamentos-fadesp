@@ -23,7 +23,6 @@ public class Problem {
         return new Builder();
     }
 
-    // getters e setters (ou use Lombok se preferir)
 
     public static class Builder {
         private final Problem p = new Problem();

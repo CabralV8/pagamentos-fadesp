@@ -10,7 +10,7 @@ public class PagamentoConverter {
     public static Pagamento toEntity(PagamentoRequestDTO dto){
         Pagamento pagamento = new Pagamento();
         pagamento.setCodigoDebito(dto.codigoDebito());
-        pagamento.setCpfCnpjPagador(dto.cpfCnpj().replaceAll("\\D", "")); // <-- normaliza
+        pagamento.setCpfCnpjPagador(dto.cpfCnpj().replaceAll("\\D", ""));
         pagamento.setMetodoPagamentoEnum(dto.metodoPagamento());
         pagamento.setNumeroCartao(dto.numeroCartao());
         pagamento.setValorTransacao(dto.valor());

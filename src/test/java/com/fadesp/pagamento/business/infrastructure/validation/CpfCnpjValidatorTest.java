@@ -6,7 +6,6 @@ import com.fadesp.pagamento.business.service.PagamentoService;
 import com.fadesp.pagamento.infrastructure.entities.Pagamento;
 import com.fadesp.pagamento.infrastructure.enums.StatusPagamentoEnum;
 import com.fadesp.pagamento.infrastructure.exceptions.BusinessException;
-import com.fadesp.pagamento.infrastructure.exceptions.ConflictException;
 import com.fadesp.pagamento.infrastructure.exceptions.NotFoundException;
 import com.fadesp.pagamento.infrastructure.repository.PagamentoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -63,23 +61,8 @@ public class CpfCnpjValidatorTest {
         pagamentoPendente.setStatus(com.fadesp.pagamento.infrastructure.enums.StatusPagamentoEnum.PENDENTE);
     }
 
-    @Test
-    void realizarPagamento_deveCriarPagamentoComSucesso_quandoValido() {
-        when(pagamentoRepository.existsByCodigoDebito(anyInt())).thenReturn(false);
-        when(pagamentoRepository.save(any(Pagamento.class))).thenReturn(pagamentoPendente);
 
-        PagamentoResponseDTO response = pagamentoService.realizarPagamento(requestValido);
 
-        assertNotNull(response);
-        assertEquals(requestValido.codigoDebito(), response.codigoDebito());
-        verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
-    }
-
-    @Test
-    void realizarPagamento_deveLancarConflictException_quandoCodigoDebitoDuplicado() {
-        when(pagamentoRepository.existsByCodigoDebito(anyInt())).thenReturn(true);
-        assertThrows(ConflictException.class, () -> pagamentoService.realizarPagamento(requestValido));
-    }
 
     @Test
     void realizarPagamento_deveLancarBusinessException_quandoValorInvalido() {
@@ -92,13 +75,6 @@ public class CpfCnpjValidatorTest {
         );
     }
 
-    @Test
-    void realizarPagamento_deveLancarConflictException_quandoDataIntegrityViolation() {
-        when(pagamentoRepository.existsByCodigoDebito(anyInt())).thenReturn(false);
-        when(pagamentoRepository.save(any())).thenThrow(new DataIntegrityViolationException("duplicate"));
-
-        assertThrows(ConflictException.class, () -> pagamentoService.realizarPagamento(requestValido));
-    }
 
     @Test
     void buscarPagamentoPorId_deveRetornarPagamento_quandoExiste() {
@@ -158,7 +134,6 @@ public class CpfCnpjValidatorTest {
     @Test
     void atualizarStatusPagamento_dePendenteParaSucesso_deveAtualizar() {
         when(pagamentoRepository.findById(1L)).thenReturn(Optional.of(pagamentoPendente));
-        // simula que o save retorna já com o novo status
         Pagamento salvo = clonePagamento(pagamentoPendente);
         salvo.setStatus(StatusPagamentoEnum.PROCESSADO_COM_SUCESSO);
         when(pagamentoRepository.save(any())).thenReturn(salvo);

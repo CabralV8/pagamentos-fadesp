@@ -16,7 +16,7 @@ class PagamentoConverterTest {
 
     @Test
     void toEntity_devePreencherCamposENormalizarDocumento() {
-        // dado um request com CPF formatado e cartão
+
         PagamentoRequestDTO dto = new PagamentoRequestDTO(
                 321,
                 "123.456.789-09",
@@ -25,17 +25,16 @@ class PagamentoConverterTest {
                 new BigDecimal("100.10")
         );
 
-        // quando
         Pagamento entity = PagamentoConverter.toEntity(dto);
 
-        // então
+
         assertNotNull(entity);
         assertEquals(321, entity.getCodigoDebito());
-        // espera CPF/CNPJ somente dígitos
+
         assertEquals("12345678909", entity.getCpfCnpjPagador());
         assertEquals(MetodoPagamentoEnum.CARTAO_CREDITO, entity.getMetodoPagamentoEnum());
         assertEquals("5555444433331111", entity.getNumeroCartao());
-        assertEquals(new BigDecimal("100.10"), entity.getValorTransacao()); // setter deve setScale(2)
+        assertEquals(new BigDecimal("100.10"), entity.getValorTransacao());
         assertEquals(StatusPagamentoEnum.PENDENTE, entity.getStatus());
         assertTrue(entity.getAtivo(), "Pagamento novo deve iniciar ativo=true");
     }
@@ -54,7 +53,7 @@ class PagamentoConverterTest {
 
         assertNull(entity.getNumeroCartao());
         assertEquals(MetodoPagamentoEnum.PIX, entity.getMetodoPagamentoEnum());
-        assertEquals("11222333000181", entity.getCpfCnpjPagador()); // já sem máscara
+        assertEquals("11222333000181", entity.getCpfCnpjPagador());
         assertEquals(new BigDecimal("250.00"), entity.getValorTransacao());
         assertEquals(StatusPagamentoEnum.PENDENTE, entity.getStatus());
         assertTrue(entity.getAtivo());
@@ -62,7 +61,7 @@ class PagamentoConverterTest {
 
     @Test
     void toResponse_deveMapearTodosOsCampos() {
-        // dado
+
         Pagamento p = new Pagamento();
         p.setId(7L);
         p.setCodigoDebito(777);
@@ -73,10 +72,10 @@ class PagamentoConverterTest {
         p.setStatus(StatusPagamentoEnum.PROCESSADO_COM_FALHA);
         p.setAtivo(true);
 
-        // quando
+
         PagamentoResponseDTO dto = PagamentoConverter.toResponse(p);
 
-        // então
+
         assertNotNull(dto);
         assertEquals(7L, dto.id());
         assertEquals(777, dto.codigoDebito());

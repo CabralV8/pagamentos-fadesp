@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 public class PagamentoService {
@@ -36,17 +35,16 @@ public class PagamentoService {
     public PagamentoResponseDTO realizarPagamento(PagamentoRequestDTO requestDTO) {
         log.info("Iniciando criação de pagamento para código de débito {}", requestDTO.codigoDebito());
         validarPagamento(requestDTO);
-        validarCodigoDebitoUnico(requestDTO.codigoDebito());
 
         Pagamento pagamento = PagamentoConverter.toEntity(requestDTO);
         try {
             Pagamento salvo = pagamentoRepository.save(pagamento);
-            log.info("Pagamento criado com sucesso. ID: {}, código débito: {}", salvo.getId(), salvo.getCodigoDebito());
             return PagamentoConverter.toResponse(salvo);
         } catch (DataIntegrityViolationException e) {
             throw new ConflictException("Código de débito já utilizado: " + requestDTO.codigoDebito(), e);
         }
     }
+
 
     @Transactional(readOnly = true)
     public PagamentoResponseDTO buscarPagamentoPorId(Long id) {
@@ -57,64 +55,6 @@ public class PagamentoService {
     }
 
     @Transactional(readOnly = true)
-    public List<PagamentoResponseDTO> buscarPorCodigoDebito(Integer codigoDebito){
-        log.info("Buscando pagamentos por código de débito {}", codigoDebito);
-        List<Pagamento> pagamentos = pagamentoRepository.findByCodigoDebito(codigoDebito);
-        if (pagamentos.isEmpty()) {
-            throw new NotFoundException("Nenhum pagamento encontrado para código de débito: " + codigoDebito);
-        }
-        return pagamentos.stream().map(PagamentoConverter::toResponse).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<PagamentoResponseDTO> buscarPorStatus(StatusPagamentoEnum status) {
-        log.info("Listando pagamentos com status {}", status);
-        List<Pagamento> pagamentos = pagamentoRepository.findByStatus(status);
-        if (pagamentos.isEmpty()) {
-            throw new NotFoundException("Nenhum pagamento encontrado com status: " + status);
-        }
-        return pagamentos.stream().map(PagamentoConverter::toResponse).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public PagamentoResponseDTO buscarPorCodigoEDocumento(Integer codigoDebito, String cpfCnpjPagador) {
-        String doc = cpfCnpjPagador.replaceAll("\\D", "");
-        return pagamentoRepository.findByCodigoDebitoAndCpfCnpjPagador(codigoDebito, doc)
-                .stream()
-                .findFirst()
-                .map(PagamentoConverter::toResponse)
-                .orElseThrow(() -> new NotFoundException("Pagamento não encontrado para código "
-                        + codigoDebito + " e CPF/CNPJ " + doc));
-    }
-
-    @Transactional(readOnly = true)
-    public List<PagamentoResponseDTO> buscarPorDocumentoEStatus(String cpfCnpj, StatusPagamentoEnum status) {
-        String doc = cpfCnpj.replaceAll("\\D", "");
-        log.info("Buscando pagamentos do CPF/CNPJ {} com status {}", doc, status);
-        List<Pagamento> pagamentos = pagamentoRepository.findByCpfCnpjPagadorAndStatus(doc, status);
-        if (pagamentos.isEmpty()) {
-            throw new NotFoundException("Nenhum pagamento encontrado para o CPF/CNPJ " + doc + " com status " + status);
-        }
-        return pagamentos.stream().map(PagamentoConverter::toResponse).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<PagamentoResponseDTO> buscarPorCpfCnpj(String cpfCnpj) {
-        String doc = cpfCnpj.replaceAll("\\D", ""); // normaliza
-        log.info("Buscando pagamentos pelo CPF/CNPJ {}", doc);
-
-        List<Pagamento> pagamentos = pagamentoRepository.findByCpfCnpjPagador(doc);
-
-        if (pagamentos.isEmpty()) {
-            throw new NotFoundException("Nenhum pagamento encontrado para o CPF/CNPJ: " + doc);
-        }
-
-        return pagamentos.stream()
-                .map(PagamentoConverter::toResponse)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
     public Page<PagamentoResponseDTO> listarTodos(Pageable pageable) {
         log.info("Listando todos os pagamentos com paginação");
 
@@ -122,6 +62,28 @@ public class PagamentoService {
 
         if (page.isEmpty()) {
             throw new NotFoundException("Nenhum pagamento encontrado no sistema.");
+        }
+
+        return page.map(PagamentoConverter::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PagamentoResponseDTO> listarComFiltros(
+            Integer codigoDebito,
+            String cpfCnpjPagador,
+            StatusPagamentoEnum status,
+            Pageable pageable
+    ) {
+        log.info("Listando com filtros: codigoDebito={}, cpfCnpjPagador={}, status={}",
+                codigoDebito, cpfCnpjPagador, status);
+        String doc = (cpfCnpjPagador != null && !cpfCnpjPagador.isBlank())
+                ? cpfCnpjPagador.replaceAll("\\D", "")
+                : null;
+
+        Page<Pagamento> page = pagamentoRepository.buscarComFiltros(codigoDebito, doc, status, pageable);
+
+        if (page.isEmpty()) {
+            throw new NotFoundException("Nenhum pagamento encontrado com os filtros informados.");
         }
 
         return page.map(PagamentoConverter::toResponse);
@@ -188,16 +150,6 @@ public class PagamentoService {
         Pagamento atualizado = pagamentoRepository.save(pagamento);
         log.info("Status do pagamento id={} atualizado de {} para {}", id, atual, atualizado.getStatus());
         return PagamentoConverter.toResponse(atualizado);
-    }
-
-    private void validarCodigoDebitoUnico(Integer codigoDebito) {
-        if (verificaPagamentoExistente(codigoDebito)) {
-            throw new ConflictException("Código de débito já utilizado: " + codigoDebito);
-        }
-    }
-
-    private boolean verificaPagamentoExistente(Integer codigoDebito) {
-        return pagamentoRepository.existsByCodigoDebito(codigoDebito);
     }
 
     private void validarPagamento(PagamentoRequestDTO requestDTO) {

@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ==== EXCEÇÕES DE NEGÓCIO / DOMÍNIO ====
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Problem> handleNotFound(NotFoundException ex, HttpServletRequest req) {
@@ -41,7 +40,7 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "Regra de negócio violada", ex.getMessage(), req.getRequestURI());
     }
 
-    // ==== VALIDAÇÃO (Bean Validation) ====
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Problem> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
@@ -87,14 +86,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(problem);
     }
 
-    // ==== ERROS DE DESERIALIZAÇÃO / TIPO ====
+
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Problem> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
                                                                 HttpServletRequest req) {
         String detail = "Corpo da requisição inválido ou malformado.";
 
-        // Mensagem amigável quando for enum inválido (ex.: StatusPagamentoEnum)
+
         if (ex.getCause() instanceof InvalidFormatException ife && ife.getTargetType().isEnum()) {
             Object[] accepted = ife.getTargetType().getEnumConstants();
             detail = "Valor inválido: '" + ife.getValue()
@@ -124,7 +123,7 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.METHOD_NOT_ALLOWED, "Método não suportado", ex.getMessage(), req.getRequestURI());
     }
 
-    // ==== DADOS / BANCO ====
+
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Problem> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest req) {
@@ -133,7 +132,7 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, "Integridade de dados", detail, req.getRequestURI());
     }
 
-    // ==== FALLBACK ====
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Problem> handleGeneric(Exception ex, HttpServletRequest req) {
@@ -141,7 +140,7 @@ public class GlobalExceptionHandler {
                 "Ocorreu um erro inesperado. Tente novamente mais tarde.", req.getRequestURI());
     }
 
-    // ==== Helper ====
+
 
     private ResponseEntity<Problem> build(HttpStatus status, String error, String message, String path) {
         Problem body = Problem.builder()
