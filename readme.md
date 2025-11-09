@@ -25,7 +25,7 @@ Ambiente	Descrição	Arquivo de configuração
 h2	Banco de dados em memória (padrão para testes)	application.properties
 ### Variáveis de Ambiente
 
-Essas variáveis podem ser configuradas no application.properties (ou sobrescritas via ambiente/Docker):
+Essas variáveis podem ser configuradas no application.properties :
 
 Variável	Descrição	Valor Padrão
 spring.datasource.url	URL do banco H2	jdbc:h2:mem:db_pagamentos
@@ -54,6 +54,19 @@ No console H2 use:
 - User: sa
 
 - Password: (vazio)
+
+  ## Documentação da API:
+  A documentação completa da API está disponível via Swagger UI, que permite visualizar e interagir com os endpoints de forma intuitiva.
+  - http://localhost:8080/swagger-ui/index.htm
+  Na documentação, você encontrará:
+
+### Parâmetros esperados de cada endpoint
+
+- Tipos de dados e exemplos de requisições
+
+- Códigos de resposta HTTP
+
+- Modelos de entrada e saída (Request/Response DTOs)
 
 #### Scripts e Coleções
 
