@@ -1,5 +1,6 @@
 # API de Pagamentos (FADESP) — Desafio Técnico Nível 1
 
+### Objetivo:
 Este projeto é um microsserviço Java Spring Boot responsável pelo gerenciamento e processamento de pagamentos.
 Permite criar, consultar, atualizar e realizar exclusão lógica de pagamentos, com controle de status e integração completa via API REST.
 A documentação está disponível via Swagger UI, e o sistema utiliza H2 Database em memória para persistência e testes locais.
