@@ -58,6 +58,7 @@ No console H2 use:
   ## Documentação da API:
   A documentação completa da API está disponível via Swagger UI, que permite visualizar e interagir com os endpoints de forma intuitiva.
   - http://localhost:8080/swagger-ui/index.htm
+  
   Na documentação, você encontrará:
 
 ### Parâmetros esperados de cada endpoint
